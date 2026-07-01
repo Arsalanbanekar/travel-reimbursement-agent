@@ -1,0 +1,44 @@
+{
+  "currency": "INR",
+  "effective_date": "2025-01-01",
+  "description": "Approval hierarchy based on total reimbursement amount. Higher amounts require more senior approvers.",
+  "policy_reference": "Section 2.2, Section 14.4",
+  "hierarchy": [
+    "Employee",
+    "Manager",
+    "Senior Manager",
+    "Finance Head"
+  ],
+  "thresholds": [
+    {
+      "min_amount": 0,
+      "max_amount": 25000,
+      "required_approver": "Manager",
+      "currency": "INR",
+      "policy_reference": "Section 2.2"
+    },
+    {
+      "min_amount": 25001,
+      "max_amount": 100000,
+      "required_approver": "Senior Manager",
+      "currency": "INR",
+      "policy_reference": "Section 2.2"
+    },
+    {
+      "min_amount": 100001,
+      "max_amount": 250000,
+      "required_approver": "Finance Head",
+      "currency": "INR",
+      "policy_reference": "Section 14.4"
+    },
+    {
+      "min_amount": 250001,
+      "max_amount": null,
+      "required_approver": "Finance Head",
+      "requires_manual_review": true,
+      "currency": "INR",
+      "policy_reference": "Section 14.4",
+      "notes": "Claims exceeding ₹2,50,000 require Manual Review and Executive sign-off."
+    }
+  ]
+}

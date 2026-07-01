@@ -1,0 +1,168 @@
+{
+  "currency": "INR",
+  "claims": [
+    {
+      "claim_id": "CLM-001",
+      "employee_id": "EMP-1042",
+      "employee_name": "Priya Sharma",
+      "department": "Engineering",
+      "travel_category": "domestic",
+      "trip_purpose": "Client site visit — Pune manufacturing unit",
+      "travel_start_date": "2025-03-14",
+      "travel_end_date": "2025-03-15",
+      "submission_date": "2025-03-18",
+      "manager_pre_approved": true,
+      "expenses": [
+        {
+          "category": "flight",
+          "description": "Round trip DEL to BLR",
+          "amount": 12850,
+          "currency": "INR",
+          "receipt_id": "RCP-002"
+        },
+        {
+          "category": "hotel",
+          "description": "1 night — Lemon Tree Hotel",
+          "amount": 4200,
+          "currency": "INR",
+          "receipt_id": "RCP-001"
+        },
+        {
+          "category": "meals",
+          "description": "Client dinner",
+          "amount": 780,
+          "currency": "INR",
+          "receipt_id": "RCP-004"
+        },
+        {
+          "category": "taxi",
+          "description": "Airport to hotel",
+          "amount": 450,
+          "currency": "INR",
+          "receipt_id": "RCP-003"
+        }
+      ],
+      "total_amount": 18280,
+      "expected_decision": "Approve",
+      "reason_code": null,
+      "expected_approved_amount": 18280,
+      "expected_rejected_amount": 0,
+      "expected_notes": "All expenses within policy limits, receipts complete, submitted within 30 days. Total ₹18,280 requires Manager approval per approval matrix (₹0–₹25,000)."
+    },
+    {
+      "claim_id": "CLM-002",
+      "employee_id": "EMP-2087",
+      "employee_name": "Arjun Mehta",
+      "department": "Sales",
+      "travel_category": "domestic",
+      "trip_purpose": "Regional sales conference — Hyderabad",
+      "travel_start_date": "2025-03-17",
+      "travel_end_date": "2025-03-18",
+      "submission_date": "2025-03-22",
+      "manager_pre_approved": true,
+      "expenses": [
+        {
+          "category": "flight",
+          "description": "One-way flight to Hyderabad",
+          "amount": 7650,
+          "currency": "INR",
+          "receipt_id": "RCP-006"
+        },
+        {
+          "category": "hotel",
+          "description": "1 night — Taj Vivanta",
+          "amount": 5800,
+          "currency": "INR",
+          "receipt_id": "RCP-005"
+        }
+      ],
+      "total_amount": 13450,
+      "expected_decision": "Partially Approve",
+      "reason_code": "LIMIT_EXCEEDED",
+      "expected_approved_amount": 12650,
+      "expected_rejected_amount": 800,
+      "expected_notes": "Hotel ₹5,800 exceeds domestic nightly limit of ₹5,000 (Section 4.1). Approve ₹5,000 for hotel + ₹7,650 flight. Reject ₹800 hotel overage."
+    },
+    {
+      "claim_id": "CLM-003",
+      "employee_id": "EMP-3156",
+      "employee_name": "Neha Kapoor",
+      "department": "Marketing",
+      "travel_category": "domestic",
+      "trip_purpose": "Team offsite — Noida office",
+      "travel_start_date": "2025-03-08",
+      "travel_end_date": "2025-03-08",
+      "submission_date": "2025-04-22",
+      "manager_pre_approved": true,
+      "expenses": [
+        {
+          "category": "train",
+          "description": "IRCTC 2AC round trip DEL to Noida",
+          "amount": 1850,
+          "currency": "INR",
+          "receipt_id": "RCP-009"
+        }
+      ],
+      "total_amount": 1850,
+      "expected_decision": "Reject",
+      "reason_code": "LATE_SUBMISSION",
+      "expected_approved_amount": 0,
+      "expected_rejected_amount": 1850,
+      "expected_notes": "Submitted 45 days after travel end date. Section 11.1 requires submission within 30 calendar days. Expense itself is otherwise valid (2AC fare within Section 9.1 limit)."
+    },
+    {
+      "claim_id": "CLM-004",
+      "employee_id": "EMP-4019",
+      "employee_name": "Rahul Verma",
+      "department": "Product",
+      "travel_category": "domestic",
+      "trip_purpose": "User research participant visit",
+      "travel_start_date": "2025-03-19",
+      "travel_end_date": "2025-03-19",
+      "submission_date": "2025-03-21",
+      "manager_pre_approved": true,
+      "expenses": [
+        {
+          "category": "meals",
+          "description": "Working lunch with research participant",
+          "amount": 680,
+          "currency": "INR",
+          "receipt_id": "RCP-008"
+        }
+      ],
+      "total_amount": 680,
+      "expected_decision": "Manual Review",
+      "reason_code": "MISSING_RECEIPT",
+      "expected_approved_amount": null,
+      "expected_rejected_amount": null,
+      "expected_notes": "Receipt RCP-008 exists in registry but attachment_present is false. Amount exceeds ₹500 receipt threshold (Section 10.1, Section 10.4, Section 14.1)."
+    },
+    {
+      "claim_id": "CLM-005",
+      "employee_id": "EMP-5023",
+      "employee_name": "Ananya Iyer",
+      "department": "Operations",
+      "travel_category": "domestic",
+      "trip_purpose": "Warehouse audit follow-up",
+      "travel_start_date": "2025-03-16",
+      "travel_end_date": "2025-03-16",
+      "submission_date": "2025-03-25",
+      "manager_pre_approved": true,
+      "expenses": [
+        {
+          "category": "taxi",
+          "description": "Client site transfer",
+          "amount": 450,
+          "currency": "INR",
+          "receipt_id": "RCP-003"
+        }
+      ],
+      "total_amount": 450,
+      "expected_decision": "Manual Review",
+      "reason_code": "DUPLICATE_RECEIPT",
+      "expected_approved_amount": null,
+      "expected_rejected_amount": null,
+      "expected_notes": "Receipt RCP-003 was already submitted on CLM-001. Duplicate receipt per Section 12.1 and Section 12.2."
+    }
+  ]
+}

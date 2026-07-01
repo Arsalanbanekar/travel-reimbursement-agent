@@ -1,0 +1,64 @@
+{
+  "currency": "INR",
+  "effective_date": "2025-01-01",
+  "policy_reference": "FIN-TRV-2025-01",
+  "limits": {
+    "hotel": {
+      "category": "Hotel",
+      "domestic_per_night": 5000,
+      "international_per_night": 12000,
+      "currency": "INR",
+      "policy_reference": "Section 4.1, Section 4.2"
+    },
+    "meals": {
+      "category": "Meals",
+      "domestic_per_day": 1000,
+      "international_per_day": 2500,
+      "currency": "INR",
+      "policy_reference": "Section 6.1, Section 6.2"
+    },
+    "taxi": {
+      "category": "Taxi / Local Transport",
+      "per_day": 2000,
+      "single_trip_max": 2500,
+      "currency": "INR",
+      "policy_reference": "Section 7.1, Section 7.2"
+    },
+    "parking": {
+      "category": "Parking",
+      "per_day": 500,
+      "currency": "INR",
+      "policy_reference": "Section 8.1"
+    },
+    "internet": {
+      "category": "Internet",
+      "per_day": 500,
+      "currency": "INR",
+      "policy_reference": "Section 8.2"
+    },
+    "flight": {
+      "category": "Flight",
+      "domestic_max": 15000,
+      "international_max": 75000,
+      "class": "Economy",
+      "currency": "INR",
+      "policy_reference": "Section 5.1, Section 5.2"
+    },
+    "train": {
+      "category": "Train",
+      "domestic_per_trip": 3500,
+      "allowed_classes": ["AC Chair Car", "2AC"],
+      "currency": "INR",
+      "policy_reference": "Section 9.1"
+    }
+  },
+  "receipt_threshold": {
+    "mandatory_above": 500,
+    "currency": "INR",
+    "policy_reference": "Section 10.1"
+  },
+  "submission_window_days": 30,
+  "submission_policy_reference": "Section 11.1",
+  "manual_review_amount_threshold": 250000,
+  "manual_review_policy_reference": "Section 14.4"
+}

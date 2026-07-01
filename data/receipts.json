@@ -1,0 +1,96 @@
+{
+  "currency": "INR",
+  "receipts": [
+    {
+      "receipt_id": "RCP-001",
+      "vendor": "Lemon Tree Hotel",
+      "category": "hotel",
+      "date": "2025-03-15",
+      "amount": 4200,
+      "currency": "INR",
+      "attachment_present": true
+    },
+    {
+      "receipt_id": "RCP-002",
+      "vendor": "IndiGo Airlines",
+      "category": "flight",
+      "date": "2025-03-14",
+      "amount": 12850,
+      "currency": "INR",
+      "attachment_present": true
+    },
+    {
+      "receipt_id": "RCP-003",
+      "vendor": "Ola Cabs",
+      "category": "taxi",
+      "date": "2025-03-15",
+      "amount": 450,
+      "currency": "INR",
+      "attachment_present": true
+    },
+    {
+      "receipt_id": "RCP-004",
+      "vendor": "Barbeque Nation",
+      "category": "meals",
+      "date": "2025-03-15",
+      "amount": 780,
+      "currency": "INR",
+      "attachment_present": true
+    },
+    {
+      "receipt_id": "RCP-005",
+      "vendor": "Taj Vivanta",
+      "category": "hotel",
+      "date": "2025-03-18",
+      "amount": 5800,
+      "currency": "INR",
+      "attachment_present": true
+    },
+    {
+      "receipt_id": "RCP-006",
+      "vendor": "SpiceJet",
+      "category": "flight",
+      "date": "2025-03-17",
+      "amount": 7650,
+      "currency": "INR",
+      "attachment_present": true
+    },
+    {
+      "receipt_id": "RCP-007",
+      "vendor": "Phoenix Mall Parking",
+      "category": "parking",
+      "date": "2025-03-11",
+      "amount": 400,
+      "currency": "INR",
+      "attachment_present": true
+    },
+    {
+      "receipt_id": "RCP-008",
+      "vendor": "Cafe Coffee Day",
+      "category": "meals",
+      "date": "2025-03-19",
+      "amount": 680,
+      "currency": "INR",
+      "attachment_present": false
+    },
+    {
+      "receipt_id": "RCP-009",
+      "vendor": "IRCTC",
+      "category": "train",
+      "date": "2025-03-08",
+      "amount": 1850,
+      "currency": "INR",
+      "attachment_present": true,
+      "travel_class": "2AC"
+    },
+    {
+      "receipt_id": "RCP-010",
+      "vendor": "JioFi Hotspot Rental",
+      "category": "internet",
+      "date": "2025-03-12",
+      "amount": 450,
+      "currency": "INR",
+      "attachment_present": true
+    }
+  ]
+}
