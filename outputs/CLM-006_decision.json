@@ -1,0 +1,213 @@
+{
+  "decision": {
+    "decision": "Manual Review",
+    "approved_amount": 16500.0,
+    "rejected_amount": 0.0,
+    "missing_documents": [],
+    "policy_references": [
+      "Section 2.2",
+      "Section 4.1",
+      "Section 4.2",
+      "Section 5.1",
+      "Section 5.2"
+    ],
+    "reason_codes": [],
+    "confidence": 0.55,
+    "explanation": "The claim lists a purpose of a client site visit in Pune, but the documented expenses are for a Delhi‑to‑Bangalore flight and a hotel stay in Bangalore. Because the locations of the expenses do not match the stated trip purpose, we need clarification before approval.\n\n[Guardrail] Model escalated to Manual Review after investigation.",
+    "required_approver": "Manager",
+    "audit_trail": [
+      {
+        "step": 1,
+        "tool_name": "intake",
+        "status": "ok",
+        "details": "Validated claim CLM-006 with 2 expense line(s)."
+      },
+      {
+        "step": 2,
+        "tool_name": "rule_engine",
+        "status": "ok",
+        "details": "Baseline Approve; allowed ₹16,500 of ₹16,500; reason codes: none."
+      },
+      {
+        "step": 3,
+        "tool_name": "policy_retrieval",
+        "status": "ok",
+        "details": "Retrieved 7 clause(s): 5.1, 5.2, 4.1, 4.2, 2.2, 13, 3."
+      },
+      {
+        "step": 4,
+        "tool_name": "agent (openai/gpt-oss-120b)",
+        "status": "ok",
+        "details": "Requested: get_receipt"
+      },
+      {
+        "step": 5,
+        "tool_name": "get_receipt",
+        "status": "ok",
+        "details": "args={'receipt_id': 'RCP-011'}"
+      },
+      {
+        "step": 6,
+        "tool_name": "agent (openai/gpt-oss-120b)",
+        "status": "ok",
+        "details": "Requested: get_receipt"
+      },
+      {
+        "step": 7,
+        "tool_name": "get_receipt",
+        "status": "ok",
+        "details": "args={'receipt_id': 'RCP-012'}"
+      },
+      {
+        "step": 8,
+        "tool_name": "agent (openai/gpt-oss-120b)",
+        "status": "ok",
+        "details": "I verified both receipts:\n\n* **RCP‑011** – Air India flight, ₹12,000, matches the claimed flight amount and is within the ₹15,000 domestic flight cap.  \n* **RCP‑012** – Ginger Hotels, ₹4,500, matches the claimed hotel amount and is under the ₹5,000 per‑night hotel limit.\n\nBoth items are properly cat"
+      },
+      {
+        "step": 9,
+        "tool_name": "decide (openai/gpt-oss-120b)",
+        "status": "ok",
+        "details": "Model proposed Manual Review."
+      },
+      {
+        "step": 10,
+        "tool_name": "guardrail",
+        "status": "override",
+        "details": "Model escalated to Manual Review after investigation."
+      }
+    ]
+  },
+  "facts": {
+    "claim_id": "CLM-006",
+    "travel_category": "domestic",
+    "total_claimed": 16500.0,
+    "total_allowed": 16500.0,
+    "total_rejected": 0.0,
+    "days_to_submit": 3,
+    "submission_window_days": 30,
+    "within_submission_window": true,
+    "required_approver": "Manager",
+    "approval_policy_reference": "Section 2.2",
+    "requires_executive_review": false,
+    "nights": 1,
+    "expense_findings": [
+      {
+        "index": 0,
+        "category": "flight",
+        "description": "Round trip DEL to BLR",
+        "receipt_id": "RCP-011",
+        "expense_date": "2025-03-20",
+        "claimed_amount": 12000.0,
+        "allowed_amount": 12000.0,
+        "excess_amount": 0.0,
+        "limit_applied": 15000.0,
+        "limit_basis": "₹15,000 per item",
+        "reason_codes": [],
+        "policy_references": [
+          "Section 5.1, Section 5.2"
+        ],
+        "notes": []
+      },
+      {
+        "index": 1,
+        "category": "hotel",
+        "description": "1 night — Ginger Hotels",
+        "receipt_id": "RCP-012",
+        "expense_date": "2025-03-20",
+        "claimed_amount": 4500.0,
+        "allowed_amount": 4500.0,
+        "excess_amount": 0.0,
+        "limit_applied": 5000.0,
+        "limit_basis": "₹5,000 per night × 1 night(s) = ₹5,000",
+        "reason_codes": [],
+        "policy_references": [
+          "Section 4.1, Section 4.2"
+        ],
+        "notes": []
+      }
+    ],
+    "reason_codes": [],
+    "missing_documents": [],
+    "policy_references": [
+      "Section 5.1, Section 5.2",
+      "Section 4.1, Section 4.2",
+      "Section 2.2"
+    ],
+    "blocking_issues": [],
+    "baseline_decision": "Approve"
+  },
+  "policy_context": "Section 5.1 — Flight Policy\n\n5.1. **Domestic flights:** Economy class only. Maximum reimbursable amount: **₹15,000 per one-way or round-trip segment**.\n\nSection 5.2 — Flight Policy\n\n5.2. **International flights:** Economy class only. Maximum reimbursable amount: **₹75,000 per round trip**.\n\nSection 4.1 — Hotel Policy\n\n4.1. **Domestic hotel limit:** Maximum **₹5,000 per night** (before taxes and fees). Taxes and service charges are reimbursable only if the pre-tax room rate is within the limit.\n\nSection 4.2 — Hotel Policy\n\n4.2. **International hotel limit:** Maximum **₹12,000 per night** (or local equivalent converted at the company rate on the date of travel).\n\nSection 2.2 — Eligibility\n\n2.2. Travel must be **pre-approved by the employee's direct manager** before departure, except for domestic day trips under **₹25,000** total estimated cost.\n\nSection 13 — Non-Reimbursable Expenses\n\nThe following are **never reimbursable**, regardless of amount:\n\n- Personal entertainment (concerts, sightseeing tours, spa treatments)\n- Traffic fines, parking tickets, and legal penalties\n- Personal grooming, laundry (unless trip exceeds 7 days)\n- Gifts for clients over **₹4,000** without pre-approval\n- Alcohol without client entertainment pre-approval\n- Expenses for spouses or family members\n- First-class or business-class travel upgrades without approval\n\nClaims consisting primarily of non-reimbursable expenses must be **Rejected**.\n\nSection 3 — Expense Categories\n\nThe following categories may be reimbursed when incurred during approved business travel:\n\n| Category | Description |\n|----------|-------------|\n| Flight | Air travel between work locations or to client sites |\n| Hotel | Overnight lodging during business travel |\n| Meals | Business meals and per-diem meal expenses |\n| Taxi / Local Transport | Taxis, rideshare, auto-rickshaw, and local ground transport |\n| Parking | Airport or client-site parking fees |\n| Internet | In-flight Wi-Fi or mobile hotspot charges for business use |\n| Train | Rail travel for business trips (AC Chair Car / 2AC class) |\n\nAll claims must itemize expenses by category. Amounts exceeding the limits in Section 4–9 require **Partial Approval** (reimbursement up to the limit only) unless a pre-approved exception exists on file.",
+  "retrieved_sections": [
+    "5.1",
+    "5.2",
+    "4.1",
+    "4.2",
+    "2.2",
+    "13",
+    "3"
+  ],
+  "audit_trail": [
+    {
+      "step": 1,
+      "tool_name": "intake",
+      "status": "ok",
+      "details": "Validated claim CLM-006 with 2 expense line(s)."
+    },
+    {
+      "step": 2,
+      "tool_name": "rule_engine",
+      "status": "ok",
+      "details": "Baseline Approve; allowed ₹16,500 of ₹16,500; reason codes: none."
+    },
+    {
+      "step": 3,
+      "tool_name": "policy_retrieval",
+      "status": "ok",
+      "details": "Retrieved 7 clause(s): 5.1, 5.2, 4.1, 4.2, 2.2, 13, 3."
+    },
+    {
+      "step": 4,
+      "tool_name": "agent (openai/gpt-oss-120b)",
+      "status": "ok",
+      "details": "Requested: get_receipt"
+    },
+    {
+      "step": 5,
+      "tool_name": "get_receipt",
+      "status": "ok",
+      "details": "args={'receipt_id': 'RCP-011'}"
+    },
+    {
+      "step": 6,
+      "tool_name": "agent (openai/gpt-oss-120b)",
+      "status": "ok",
+      "details": "Requested: get_receipt"
+    },
+    {
+      "step": 7,
+      "tool_name": "get_receipt",
+      "status": "ok",
+      "details": "args={'receipt_id': 'RCP-012'}"
+    },
+    {
+      "step": 8,
+      "tool_name": "agent (openai/gpt-oss-120b)",
+      "status": "ok",
+      "details": "I verified both receipts:\n\n* **RCP‑011** – Air India flight, ₹12,000, matches the claimed flight amount and is within the ₹15,000 domestic flight cap.  \n* **RCP‑012** – Ginger Hotels, ₹4,500, matches the claimed hotel amount and is under the ₹5,000 per‑night hotel limit.\n\nBoth items are properly cat"
+    },
+    {
+      "step": 9,
+      "tool_name": "decide (openai/gpt-oss-120b)",
+      "status": "ok",
+      "details": "Model proposed Manual Review."
+    },
+    {
+      "step": 10,
+      "tool_name": "guardrail",
+      "status": "override",
+      "details": "Model escalated to Manual Review after investigation."
+    }
+  ],
+  "llm_error": null
+}

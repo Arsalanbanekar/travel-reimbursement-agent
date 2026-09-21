@@ -1,0 +1,181 @@
+{
+  "run_at": "2026-09-20T20:09:59+00:00",
+  "model": "openai/gpt-oss-120b",
+  "decision_accuracy": "7/7",
+  "rule_decidable_accuracy": "5/5",
+  "judgement_case_accuracy": "2/2",
+  "amount_accuracy": "3/3",
+  "citation_validity": "7/7",
+  "claims": [
+    {
+      "claim_id": "CLM-001",
+      "expected_decision": "Approve",
+      "actual_decision": "Approve",
+      "decision_ok": true,
+      "needs_judgement": false,
+      "expected_approved": 18280,
+      "actual_approved": 18280.0,
+      "expected_rejected": 0,
+      "actual_rejected": 0.0,
+      "amount_ok": true,
+      "confidence": 0.95,
+      "reason_codes": [],
+      "unsupported_citations": [],
+      "tools_used": [
+        "get_receipt",
+        "get_receipt",
+        "find_claims_using_receipt",
+        "get_receipt",
+        "search_policy"
+      ],
+      "steps": 16,
+      "seconds": 37.7,
+      "llm_error": null
+    },
+    {
+      "claim_id": "CLM-002",
+      "expected_decision": "Partially Approve",
+      "actual_decision": "Partially Approve",
+      "decision_ok": true,
+      "needs_judgement": false,
+      "expected_approved": 12650,
+      "actual_approved": 12650.0,
+      "expected_rejected": 800,
+      "actual_rejected": 800.0,
+      "amount_ok": true,
+      "confidence": 0.95,
+      "reason_codes": [
+        "LIMIT_EXCEEDED"
+      ],
+      "unsupported_citations": [],
+      "tools_used": [
+        "get_receipt",
+        "get_receipt",
+        "search_policy",
+        "search_policy",
+        "search_policy"
+      ],
+      "steps": 16,
+      "seconds": 99.7,
+      "llm_error": null
+    },
+    {
+      "claim_id": "CLM-003",
+      "expected_decision": "Reject",
+      "actual_decision": "Reject",
+      "decision_ok": true,
+      "needs_judgement": false,
+      "expected_approved": 0,
+      "actual_approved": 0.0,
+      "expected_rejected": 1850,
+      "actual_rejected": 1850.0,
+      "amount_ok": true,
+      "confidence": 0.9,
+      "reason_codes": [
+        "LATE_SUBMISSION"
+      ],
+      "unsupported_citations": [],
+      "tools_used": [],
+      "steps": 6,
+      "seconds": 27.6,
+      "llm_error": null
+    },
+    {
+      "claim_id": "CLM-004",
+      "expected_decision": "Manual Review",
+      "actual_decision": "Manual Review",
+      "decision_ok": true,
+      "needs_judgement": false,
+      "expected_approved": null,
+      "actual_approved": 680.0,
+      "expected_rejected": null,
+      "actual_rejected": 0.0,
+      "amount_ok": null,
+      "confidence": 0.55,
+      "reason_codes": [
+        "MISSING_RECEIPT"
+      ],
+      "unsupported_citations": [],
+      "tools_used": [
+        "get_receipt",
+        "find_claims_using_receipt"
+      ],
+      "steps": 10,
+      "seconds": 43.5,
+      "llm_error": null
+    },
+    {
+      "claim_id": "CLM-005",
+      "expected_decision": "Manual Review",
+      "actual_decision": "Manual Review",
+      "decision_ok": true,
+      "needs_judgement": false,
+      "expected_approved": null,
+      "actual_approved": 450.0,
+      "expected_rejected": null,
+      "actual_rejected": 0.0,
+      "amount_ok": null,
+      "confidence": 0.55,
+      "reason_codes": [
+        "DUPLICATE_RECEIPT"
+      ],
+      "unsupported_citations": [],
+      "tools_used": [
+        "search_policy",
+        "search_policy",
+        "search_policy",
+        "search_policy",
+        "search_policy",
+        "search_policy",
+        "search_policy",
+        "search_policy"
+      ],
+      "steps": 22,
+      "seconds": 149.1,
+      "llm_error": null
+    },
+    {
+      "claim_id": "CLM-006",
+      "expected_decision": "Manual Review",
+      "actual_decision": "Manual Review",
+      "decision_ok": true,
+      "needs_judgement": true,
+      "expected_approved": null,
+      "actual_approved": 16500.0,
+      "expected_rejected": null,
+      "actual_rejected": 0.0,
+      "amount_ok": null,
+      "confidence": 0.55,
+      "reason_codes": [],
+      "unsupported_citations": [],
+      "tools_used": [
+        "get_receipt",
+        "get_receipt"
+      ],
+      "steps": 10,
+      "seconds": 36.4,
+      "llm_error": null
+    },
+    {
+      "claim_id": "CLM-007",
+      "expected_decision": "Manual Review",
+      "actual_decision": "Manual Review",
+      "decision_ok": true,
+      "needs_judgement": true,
+      "expected_approved": null,
+      "actual_approved": 950.0,
+      "expected_rejected": null,
+      "actual_rejected": 0.0,
+      "amount_ok": null,
+      "confidence": 0.55,
+      "reason_codes": [],
+      "unsupported_citations": [],
+      "tools_used": [
+        "get_receipt"
+      ],
+      "steps": 8,
+      "seconds": 27.4,
+      "llm_error": null
+    }
+  ]
+}

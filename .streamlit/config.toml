@@ -1,0 +1,8 @@
+# Dark theme, so the deployed app and the README screenshots match regardless
+# of the viewer's OS preference.
+[theme]
+base = "dark"
+primaryColor = "#f87171"
+backgroundColor = "#0e1117"
+secondaryBackgroundColor = "#1a1f2b"
+textColor = "#e6edf3"

@@ -1,0 +1,170 @@
+{
+  "decision": {
+    "decision": "Manual Review",
+    "approved_amount": 950.0,
+    "rejected_amount": 0.0,
+    "missing_documents": [],
+    "policy_references": [
+      "Section 2.2",
+      "Section 6.1",
+      "Section 6.2",
+      "Section 6.3"
+    ],
+    "reason_codes": [],
+    "confidence": 0.55,
+    "explanation": "Your claim is partially approved because the meal expense includes alcohol, which is only reimbursable when entertaining clients and pre‑approved. Since this was an internal team dinner without such approval, the alcohol portion is non‑reimbursable per policy Section 6.3. Please adjust the claim to exclude the cost of wine and cocktails.\n\n[Guardrail] Model proposed Partially Approve against a rules baseline of Approve. Routed to Manual Review because they disagree.",
+    "required_approver": "Manager",
+    "audit_trail": [
+      {
+        "step": 1,
+        "tool_name": "intake",
+        "status": "ok",
+        "details": "Validated claim CLM-007 with 1 expense line(s)."
+      },
+      {
+        "step": 2,
+        "tool_name": "rule_engine",
+        "status": "ok",
+        "details": "Baseline Approve; allowed ₹950 of ₹950; reason codes: none."
+      },
+      {
+        "step": 3,
+        "tool_name": "policy_retrieval",
+        "status": "ok",
+        "details": "Retrieved 7 clause(s): 6.1, 6.2, 2.2, 6.3, 6.4, 13, 3."
+      },
+      {
+        "step": 4,
+        "tool_name": "agent (openai/gpt-oss-120b)",
+        "status": "ok",
+        "details": "Requested: get_receipt"
+      },
+      {
+        "step": 5,
+        "tool_name": "get_receipt",
+        "status": "ok",
+        "details": "args={'receipt_id': 'RCP-013'}"
+      },
+      {
+        "step": 6,
+        "tool_name": "agent (openai/gpt-oss-120b)",
+        "status": "ok",
+        "details": "I verified the receipt (RCP‑013) and confirmed it matches the claimed ₹950 for a “team dinner including wine and cocktails” on the travel day.\n\nThe meal amount is within the ₹1,000 per‑day domestic limit, so the line passes the basic meal‑cap check that the rule engine applied. However, Section 6.3 "
+      },
+      {
+        "step": 7,
+        "tool_name": "decide (openai/gpt-oss-120b)",
+        "status": "ok",
+        "details": "Model proposed Partially Approve."
+      },
+      {
+        "step": 8,
+        "tool_name": "guardrail",
+        "status": "override",
+        "details": "Model proposed Partially Approve against a rules baseline of Approve. Routed to Manual Review because they disagree."
+      }
+    ]
+  },
+  "facts": {
+    "claim_id": "CLM-007",
+    "travel_category": "domestic",
+    "total_claimed": 950.0,
+    "total_allowed": 950.0,
+    "total_rejected": 0.0,
+    "days_to_submit": 4,
+    "submission_window_days": 30,
+    "within_submission_window": true,
+    "required_approver": "Manager",
+    "approval_policy_reference": "Section 2.2",
+    "requires_executive_review": false,
+    "nights": 0,
+    "expense_findings": [
+      {
+        "index": 0,
+        "category": "meals",
+        "description": "Team dinner including wine and cocktails",
+        "receipt_id": "RCP-013",
+        "expense_date": "2025-03-21",
+        "claimed_amount": 950.0,
+        "allowed_amount": 950.0,
+        "excess_amount": 0.0,
+        "limit_applied": 1000.0,
+        "limit_basis": "₹1,000 per day for meals on 2025-03-21",
+        "reason_codes": [],
+        "policy_references": [
+          "Section 6.1, Section 6.2"
+        ],
+        "notes": []
+      }
+    ],
+    "reason_codes": [],
+    "missing_documents": [],
+    "policy_references": [
+      "Section 6.1, Section 6.2",
+      "Section 2.2"
+    ],
+    "blocking_issues": [],
+    "baseline_decision": "Approve"
+  },
+  "policy_context": "Section 6.1 — Meal Policy\n\n6.1. **Domestic meals:** Maximum **₹1,000 per day** (total of all meal expenses that day).\n\nSection 6.2 — Meal Policy\n\n6.2. **International meals:** Maximum **₹2,500 per day**.\n\nSection 2.2 — Eligibility\n\n2.2. Travel must be **pre-approved by the employee's direct manager** before departure, except for domestic day trips under **₹25,000** total estimated cost.\n\nSection 6.3 — Meal Policy\n\n6.3. Alcohol is reimbursable only when entertaining clients and only if pre-approved; maximum **₹2,500 per person per meal**.\n\nSection 6.4 — Meal Policy\n\n6.4. Meals during commute or non-travel days are not reimbursable.\n\nSection 13 — Non-Reimbursable Expenses\n\nThe following are **never reimbursable**, regardless of amount:\n\n- Personal entertainment (concerts, sightseeing tours, spa treatments)\n- Traffic fines, parking tickets, and legal penalties\n- Personal grooming, laundry (unless trip exceeds 7 days)\n- Gifts for clients over **₹4,000** without pre-approval\n- Alcohol without client entertainment pre-approval\n- Expenses for spouses or family members\n- First-class or business-class travel upgrades without approval\n\nClaims consisting primarily of non-reimbursable expenses must be **Rejected**.\n\nSection 3 — Expense Categories\n\nThe following categories may be reimbursed when incurred during approved business travel:\n\n| Category | Description |\n|----------|-------------|\n| Flight | Air travel between work locations or to client sites |\n| Hotel | Overnight lodging during business travel |\n| Meals | Business meals and per-diem meal expenses |\n| Taxi / Local Transport | Taxis, rideshare, auto-rickshaw, and local ground transport |\n| Parking | Airport or client-site parking fees |\n| Internet | In-flight Wi-Fi or mobile hotspot charges for business use |\n| Train | Rail travel for business trips (AC Chair Car / 2AC class) |\n\nAll claims must itemize expenses by category. Amounts exceeding the limits in Section 4–9 require **Partial Approval** (reimbursement up to the limit only) unless a pre-approved exception exists on file.",
+  "retrieved_sections": [
+    "6.1",
+    "6.2",
+    "2.2",
+    "6.3",
+    "6.4",
+    "13",
+    "3"
+  ],
+  "audit_trail": [
+    {
+      "step": 1,
+      "tool_name": "intake",
+      "status": "ok",
+      "details": "Validated claim CLM-007 with 1 expense line(s)."
+    },
+    {
+      "step": 2,
+      "tool_name": "rule_engine",
+      "status": "ok",
+      "details": "Baseline Approve; allowed ₹950 of ₹950; reason codes: none."
+    },
+    {
+      "step": 3,
+      "tool_name": "policy_retrieval",
+      "status": "ok",
+      "details": "Retrieved 7 clause(s): 6.1, 6.2, 2.2, 6.3, 6.4, 13, 3."
+    },
+    {
+      "step": 4,
+      "tool_name": "agent (openai/gpt-oss-120b)",
+      "status": "ok",
+      "details": "Requested: get_receipt"
+    },
+    {
+      "step": 5,
+      "tool_name": "get_receipt",
+      "status": "ok",
+      "details": "args={'receipt_id': 'RCP-013'}"
+    },
+    {
+      "step": 6,
+      "tool_name": "agent (openai/gpt-oss-120b)",
+      "status": "ok",
+      "details": "I verified the receipt (RCP‑013) and confirmed it matches the claimed ₹950 for a “team dinner including wine and cocktails” on the travel day.\n\nThe meal amount is within the ₹1,000 per‑day domestic limit, so the line passes the basic meal‑cap check that the rule engine applied. However, Section 6.3 "
+    },
+    {
+      "step": 7,
+      "tool_name": "decide (openai/gpt-oss-120b)",
+      "status": "ok",
+      "details": "Model proposed Partially Approve."
+    },
+    {
+      "step": 8,
+      "tool_name": "guardrail",
+      "status": "override",
+      "details": "Model proposed Partially Approve against a rules baseline of Approve. Routed to Manual Review because they disagree."
+    }
+  ],
+  "llm_error": null
+}

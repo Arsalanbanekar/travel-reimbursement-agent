@@ -1,0 +1,30 @@
+{
+  "claim_id": "CLM-UPLOAD-001",
+  "employee_id": "EMP-8801",
+  "employee_name": "Test Employee",
+  "department": "Finance",
+  "travel_category": "domestic",
+  "trip_purpose": "Vendor audit — Mumbai warehouse",
+  "travel_start_date": "2025-03-11",
+  "travel_end_date": "2025-03-12",
+  "submission_date": "2025-03-15",
+  "manager_pre_approved": true,
+  "currency": "INR",
+  "expenses": [
+    {
+      "category": "parking",
+      "description": "Airport parking",
+      "amount": 400,
+      "currency": "INR",
+      "receipt_id": "RCP-007"
+    },
+    {
+      "category": "internet",
+      "description": "Mobile hotspot rental",
+      "amount": 450,
+      "currency": "INR",
+      "receipt_id": "RCP-010"
+    }
+  ],
+  "total_amount": 850
+}

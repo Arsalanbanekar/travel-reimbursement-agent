@@ -91,6 +91,33 @@
       "amount": 450,
       "currency": "INR",
       "attachment_present": true
+    },
+    {
+      "receipt_id": "RCP-011",
+      "vendor": "Air India",
+      "category": "flight",
+      "date": "2025-03-20",
+      "amount": 12000,
+      "currency": "INR",
+      "attachment_present": true
+    },
+    {
+      "receipt_id": "RCP-012",
+      "vendor": "Ginger Hotels",
+      "category": "hotel",
+      "date": "2025-03-20",
+      "amount": 4500,
+      "currency": "INR",
+      "attachment_present": true
+    },
+    {
+      "receipt_id": "RCP-013",
+      "vendor": "The Tasting Room",
+      "category": "meals",
+      "date": "2025-03-21",
+      "amount": 950,
+      "currency": "INR",
+      "attachment_present": true
     }
   ]
 }

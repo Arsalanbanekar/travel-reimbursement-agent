@@ -7,7 +7,7 @@
       "employee_name": "Priya Sharma",
       "department": "Engineering",
       "travel_category": "domestic",
-      "trip_purpose": "Client site visit — Pune manufacturing unit",
+      "trip_purpose": "Client site visit — Bengaluru engineering centre",
       "travel_start_date": "2025-03-14",
       "travel_end_date": "2025-03-15",
       "submission_date": "2025-03-18",
@@ -44,6 +44,7 @@
       ],
       "total_amount": 18280,
       "expected_decision": "Approve",
+      "expected_baseline_decision": "Approve",
       "reason_code": null,
       "expected_approved_amount": 18280,
       "expected_rejected_amount": 0,
@@ -78,6 +79,7 @@
       ],
       "total_amount": 13450,
       "expected_decision": "Partially Approve",
+      "expected_baseline_decision": "Partially Approve",
       "reason_code": "LIMIT_EXCEEDED",
       "expected_approved_amount": 12650,
       "expected_rejected_amount": 800,
@@ -105,6 +107,7 @@
       ],
       "total_amount": 1850,
       "expected_decision": "Reject",
+      "expected_baseline_decision": "Reject",
       "reason_code": "LATE_SUBMISSION",
       "expected_approved_amount": 0,
       "expected_rejected_amount": 1850,
@@ -132,6 +135,7 @@
       ],
       "total_amount": 680,
       "expected_decision": "Manual Review",
+      "expected_baseline_decision": "Manual Review",
       "reason_code": "MISSING_RECEIPT",
       "expected_approved_amount": null,
       "expected_rejected_amount": null,
@@ -159,10 +163,74 @@
       ],
       "total_amount": 450,
       "expected_decision": "Manual Review",
+      "expected_baseline_decision": "Manual Review",
       "reason_code": "DUPLICATE_RECEIPT",
       "expected_approved_amount": null,
       "expected_rejected_amount": null,
       "expected_notes": "Receipt RCP-003 was already submitted on CLM-001. Duplicate receipt per Section 12.1 and Section 12.2."
+    },
+    {
+      "claim_id": "CLM-006",
+      "employee_id": "EMP-6011",
+      "employee_name": "Vikram Rao",
+      "department": "Engineering",
+      "travel_category": "domestic",
+      "trip_purpose": "Client site visit — Pune manufacturing unit",
+      "travel_start_date": "2025-03-20",
+      "travel_end_date": "2025-03-21",
+      "submission_date": "2025-03-24",
+      "manager_pre_approved": true,
+      "expenses": [
+        {
+          "category": "flight",
+          "description": "Round trip DEL to BLR",
+          "amount": 12000,
+          "currency": "INR",
+          "receipt_id": "RCP-011"
+        },
+        {
+          "category": "hotel",
+          "description": "1 night — Ginger Hotels",
+          "amount": 4500,
+          "currency": "INR",
+          "receipt_id": "RCP-012"
+        }
+      ],
+      "total_amount": 16500,
+      "expected_decision": "Manual Review",
+      "expected_baseline_decision": "Approve",
+      "reason_code": "PURPOSE_ITINERARY_MISMATCH",
+      "expected_approved_amount": null,
+      "expected_rejected_amount": null,
+      "expected_notes": "Every numeric rule passes, so the rule engine alone would Approve. The trip purpose is a Pune site visit but the flight is Delhi to Bengaluru. Only the LLM can spot this contradiction (Section 14.6)."
+    },
+    {
+      "claim_id": "CLM-007",
+      "employee_id": "EMP-7042",
+      "employee_name": "Sanjana Pillai",
+      "department": "Sales",
+      "travel_category": "domestic",
+      "trip_purpose": "Quarterly client review — Mumbai",
+      "travel_start_date": "2025-03-21",
+      "travel_end_date": "2025-03-21",
+      "submission_date": "2025-03-25",
+      "manager_pre_approved": true,
+      "expenses": [
+        {
+          "category": "meals",
+          "description": "Team dinner including wine and cocktails",
+          "amount": 950,
+          "currency": "INR",
+          "receipt_id": "RCP-013"
+        }
+      ],
+      "total_amount": 950,
+      "expected_decision": "Manual Review",
+      "expected_baseline_decision": "Approve",
+      "reason_code": "ALCOHOL_WITHOUT_PREAPPROVAL",
+      "expected_approved_amount": null,
+      "expected_rejected_amount": null,
+      "expected_notes": "₹950 is within the ₹1,000 daily meal limit, so the rule engine alone would Approve. The description mentions alcohol, which needs client-entertainment pre-approval (Section 6.3, Section 13)."
     }
   ]
 }

@@ -1,328 +1,16 @@
-# import json
-# from pathlib import Path
-# import streamlit as st
-# from agent.agent import ReimbursementAgent
-
-# # -------------------------------------------------------
-# # Page Configuration
-# # -------------------------------------------------------
-# st.set_page_config(
-#     page_title="Travel Reimbursement Approval Agent",
-#     page_icon="💼",
-#     layout="wide",
-# )
-
-# st.title("💼 Travel Reimbursement Approval Agent")
-# st.markdown(
-#     """
-# This application demonstrates an AI-powered reimbursement approval workflow using:
-# - Planner (LLM)
-# - Retrieval-Augmented Generation (RAG)
-# - Business Validation Tools
-# - Structured AI Decision Making
-# """
-# )
-
-# # -------------------------------------------------------
-# # Load Sample Claims
-# # -------------------------------------------------------
-# DATA_PATH = Path("data") / "sample_claims.json"
-
-# with open(DATA_PATH, "r", encoding="utf-8") as f:
-#     sample_claims = json.load(f)["claims"]
-
-# claim_lookup = {
-#     claim["claim_id"]: claim
-#     for claim in sample_claims
-# }
-
-# # -------------------------------------------------------
-# # Sidebar
-# # -------------------------------------------------------
-# st.sidebar.header("Claim Input")
-
-# claim_mode = st.sidebar.radio(
-#     "Choose Input Method",
-#     [
-#         "Sample Claim",
-#         "Upload JSON",
-#     ],
-# )
-
-# selected_claim = None
-
-# if claim_mode == "Sample Claim":
-#     claim_id = st.sidebar.selectbox(
-#         "Select Claim",
-#         list(claim_lookup.keys()),
-#     )
-#     selected_claim = claim_lookup[claim_id]
-# else:
-#     uploaded_file = st.sidebar.file_uploader(
-#         "Upload Claim JSON",
-#         type=["json"],
-#     )
-#     if uploaded_file is not None:
-#         selected_claim = json.load(uploaded_file)
-
-# # -------------------------------------------------------
-# # Agent
-# # -------------------------------------------------------
-# agent = ReimbursementAgent()
-
-# # -------------------------------------------------------
-# # Evaluate Button
-# # -------------------------------------------------------
-# run_clicked = st.sidebar.button(
-#     "Evaluate Claim",
-#     use_container_width=True,
-# )
-
-# # -------------------------------------------------------
-# # Main UI — Claim Details
-# # -------------------------------------------------------
-# if selected_claim is not None:
-
-#     st.subheader("Claim Details")
-
-#     left, right = st.columns(2)
-
-#     with left:
-#         st.metric(
-#             "Claim ID",
-#             selected_claim["claim_id"],
-#         )
-#         st.metric(
-#             "Employee",
-#             selected_claim["employee_name"],
-#         )
-#         st.metric(
-#             "Department",
-#             selected_claim["department"],
-#         )
-
-#     with right:
-#         st.metric(
-#             "Trip Start",
-#             selected_claim["travel_start_date"],
-#         )
-#         st.metric(
-#             "Trip End",
-#             selected_claim["travel_end_date"],
-#         )
-#         st.metric(
-#             "Submission",
-#             selected_claim["submission_date"],
-#         )
-
-#     st.divider()
-
-#     st.subheader("Expense Items")
-#     st.dataframe(
-#         selected_claim["expenses"],
-#         use_container_width=True,
-#     )
-
-# # -------------------------------------------------------
-# # Run Agent
-# # -------------------------------------------------------
-# if run_clicked and selected_claim is not None:
-#     with st.spinner("Running AI Reimbursement Agent..."):
-#         result = agent.run_claim(selected_claim)
-
-#     st.success("Evaluation completed.")
-#     st.session_state["result"] = result
-#     st.session_state["evaluated_claim_id"] = selected_claim["claim_id"]
-
-# # -------------------------------------------------------
-# # Display Results
-# # -------------------------------------------------------
-# if "result" in st.session_state:
-
-#     result = st.session_state["result"]
-#     planner_tools = result["selected_tools"]
-#     tool_results = result["tool_results"]
-#     decision = result["decision"]
-
-#     st.divider()
-
-#     # ===================================================
-#     # Planner
-#     # ===================================================
-#     st.subheader("🧠 Planner Decision")
-#     st.write(
-#         "The planner LLM selected the following tools before evaluating the claim."
-#     )
-
-#     cols = st.columns(len(planner_tools))
-#     for i, tool in enumerate(planner_tools):
-#         with cols[i]:
-#             st.success(tool)
-
-#     st.divider()
-
-#     # ===================================================
-#     # Tool Outputs
-#     # ===================================================
-#     st.subheader("🛠 Tool Execution Results")
-
-#     if "policy" in tool_results:
-#         with st.expander("📘 Retrieved Policy", expanded=False):
-#             st.markdown(tool_results["policy"])
-
-#     if "receipt_validation" in tool_results:
-#         with st.expander("🧾 Receipt Validation", expanded=False):
-#             for receipt in tool_results["receipt_validation"]:
-#                 st.json(receipt)
-
-#     if "limit_check" in tool_results:
-#         with st.expander("💰 Reimbursement Limit Check", expanded=False):
-#             st.json(tool_results["limit_check"])
-
-#     if "duplicate_check" in tool_results:
-#         with st.expander("🔁 Duplicate Receipt Check", expanded=False):
-#             for duplicate in tool_results["duplicate_check"]:
-#                 st.json(duplicate)
-
-#     if "threshold_check" in tool_results:
-#         with st.expander("👤 Approval Threshold", expanded=False):
-#             st.json(tool_results["threshold_check"])
-
-#     st.divider()
-
-#     # ===================================================
-#     # Final Decision
-#     # ===================================================
-#     st.subheader("✅ Final Decision")
-
-#     decision_value = decision["decision"]
-
-#     if decision_value == "Approve":
-#         st.success(f"🟢 {decision_value}")
-#     elif decision_value == "Partially Approve":
-#         st.warning(f"🟡 {decision_value}")
-#     elif decision_value == "Reject":
-#         st.error(f"🔴 {decision_value}")
-#     else:
-#         st.info(f"🟠 {decision_value}")
-
-#     st.divider()
-
-#     # -------------------------------------------------------
-#     # Decision Summary
-#     # -------------------------------------------------------
-#     col1, col2, col3 = st.columns(3)
-
-#     with col1:
-#         st.metric(
-#             "Approved Amount",
-#             f"₹ {decision['approved_amount']:,}"
-#         )
-
-#     with col2:
-#         st.metric(
-#             "Rejected Amount",
-#             f"₹ {decision['rejected_amount']:,}"
-#         )
-
-#     with col3:
-#         st.metric(
-#             "Confidence",
-#             f"{decision['confidence'] * 100:.1f}%"
-#         )
-
-#     st.divider()
-
-#     # -------------------------------------------------------
-#     # Missing Documents
-#     # -------------------------------------------------------
-#     st.subheader("📄 Missing Documents")
-
-#     missing_docs = decision.get("missing_documents", [])
-
-#     if missing_docs:
-#         for doc in missing_docs:
-#             st.write(f"• {doc}")
-#     else:
-#         st.success("No missing documents.")
-
-#     st.divider()
-
-#     # -------------------------------------------------------
-#     # Policy References
-#     # -------------------------------------------------------
-#     st.subheader("📚 Policy References")
-
-#     policy_refs = decision.get("policy_references", [])
-
-#     if policy_refs:
-#         for ref in policy_refs:
-#             st.write(f"• {ref}")
-#     else:
-#         st.info("No policy references returned.")
-
-#     st.divider()
-
-#     # -------------------------------------------------------
-#     # Explanation
-#     # -------------------------------------------------------
-#     st.subheader("💬 AI Explanation")
-
-#     st.write(
-#         decision.get(
-#             "explanation",
-#             "No explanation available."
-#         )
-#     )
-
-#     st.divider()
-
-#     # -------------------------------------------------------
-#     # Raw JSON
-#     # -------------------------------------------------------
-#     with st.expander("📦 Full JSON Output", expanded=False):
-#         st.json(result)
-
-#     # -------------------------------------------------------
-#     # Download Button
-#     # -------------------------------------------------------
-#     st.download_button(
-#         label="⬇ Download Decision JSON",
-#         data=json.dumps(result, indent=4),
-#         file_name=f"{st.session_state['evaluated_claim_id']}_decision.json",
-#         mime="application/json",
-#     )
-
-# # -------------------------------------------------------
-# # Footer
-# # -------------------------------------------------------
-# st.divider()
-# st.caption(
-#     "Built for the HCLTech GenAI Developer Assignment | "
-#     "Planner → RAG → Business Tools → LLM Decision"
-# )
-
-
-
-
-
-
-
-
-
-
+"""
+Streamlit front end for the Travel Reimbursement Approval Agent.
+
+The layout deliberately mirrors the architecture: what the rules computed,
+what the agent investigated, and what the guardrail finally decided.
+"""
 
 import json
-from pathlib import Path
 
 import streamlit as st
 
-from agent.agent import ReimbursementAgent
-
-
-# ==========================================================
-# Page Configuration
-# ==========================================================
+from agent.config import DATA_DIR, GROQ_MODEL
+from agent.graph import run_claim
 
 st.set_page_config(
     page_title="Travel Reimbursement Approval Agent",
@@ -330,420 +18,340 @@ st.set_page_config(
     layout="wide",
 )
 
-st.title("💼 Travel Reimbursement Approval Agent")
 
-st.markdown(
-    """
-This application demonstrates an AI-powered reimbursement approval workflow using:
+WORKFLOW_DOT = """
+digraph {
+    rankdir=LR;
+    bgcolor="transparent";
+    node [shape=box style="rounded,filled" fontname="Helvetica" fontsize=11
+          color="#cbd5e1" fillcolor="#f1f5f9" fontcolor="#0f172a"];
+    edge [color="#94a3b8" fontname="Helvetica" fontsize=9];
 
-- Planner (LLM)
-- Retrieval-Augmented Generation (RAG)
-- Business Validation Tools
-- Structured AI Decision Making
+    intake     [label="intake\\nvalidate claim"];
+    precheck   [label="precheck\\nrule engine" fillcolor="#dbeafe"];
+    retrieve   [label="retrieve\\npolicy clauses" fillcolor="#dbeafe"];
+    agent      [label="agent\\nLLM investigates" fillcolor="#fef3c7"];
+    tools      [label="tools\\n5 lookups" fillcolor="#fef3c7"];
+    decide     [label="decide\\nstructured output" fillcolor="#fef3c7"];
+    guardrail  [label="guardrail\\nrules override LLM" fillcolor="#dcfce7"];
+
+    intake -> precheck -> retrieve -> agent;
+    agent -> tools [label="needs a lookup"];
+    tools -> agent;
+    agent -> decide [label="done"];
+    decide -> guardrail;
+}
 """
-)
 
+NODE_LABELS = {
+    "intake": "Validating claim",
+    "precheck": "Running rule engine",
+    "retrieve": "Retrieving policy clauses",
+    "agent": "Agent investigating",
+    "tools": "Calling tools",
+    "tools_audit": "Recording tool calls",
+    "decide": "Drafting decision",
+    "guardrail": "Applying guardrail",
+}
 
-# ==========================================================
-# Session State Initialization
-# ==========================================================
-
-if "result" not in st.session_state:
-    st.session_state.result = None
-
-if "evaluated_claim_id" not in st.session_state:
-    st.session_state.evaluated_claim_id = None
-
-if "current_claim_id" not in st.session_state:
-    st.session_state.current_claim_id = None
-
-
-# ==========================================================
-# Load Sample Claims
-# ==========================================================
-
-DATA_PATH = Path("data") / "sample_claims.json"
-
-with open(DATA_PATH, "r", encoding="utf-8") as f:
-    sample_claims = json.load(f)["claims"]
-
-claim_lookup = {
-    claim["claim_id"]: claim
-    for claim in sample_claims
+DECISION_STYLE = {
+    "Approve": ("🟢", st.success),
+    "Partially Approve": ("🟡", st.warning),
+    "Reject": ("🔴", st.error),
+    "Manual Review": ("🟠", st.info),
 }
 
 
-# ==========================================================
+@st.cache_data
+def load_sample_claims() -> dict:
+    with open(DATA_DIR / "sample_claims.json", encoding="utf-8") as f:
+        return {c["claim_id"]: c for c in json.load(f)["claims"]}
+
+
+def reset_result() -> None:
+    st.session_state.result = None
+    st.session_state.evaluated_claim_id = None
+
+
+st.session_state.setdefault("result", None)
+st.session_state.setdefault("evaluated_claim_id", None)
+st.session_state.setdefault("current_claim_id", None)
+
+
+# ---------------------------------------------------------------------------
 # Sidebar
-# ==========================================================
+# ---------------------------------------------------------------------------
 
-st.sidebar.header("Claim Input")
+st.sidebar.header("Claim input")
 
-claim_mode = st.sidebar.radio(
-    "Choose Input Method",
-    [
-        "Sample Claim",
-        "Upload JSON",
-    ],
-)
+claim_mode = st.sidebar.radio("Source", ["Sample claim", "Upload JSON"])
 
+claim_lookup = load_sample_claims()
 selected_claim = None
 
+if claim_mode == "Sample claim":
+    options = ["Select a claim"] + list(claim_lookup)
+    chosen = st.sidebar.selectbox("Claim", options, index=0)
 
-# ==========================================================
-# Sample Claim Mode
-# ==========================================================
+    if chosen != "Select a claim":
+        selected_claim = claim_lookup[chosen]
 
-if claim_mode == "Sample Claim":
-
-    claim_options = ["Select a Claim"] + list(claim_lookup.keys())
-
-    selected_option = st.sidebar.selectbox(
-        "Select Claim",
-        claim_options,
-        index=0,
-    )
-
-    if selected_option != "Select a Claim":
-        selected_claim = claim_lookup[selected_option]
-
-        if (
-            st.session_state.current_claim_id
-            != selected_claim["claim_id"]
-        ):
-
-            st.session_state.current_claim_id = (
-                selected_claim["claim_id"]
-            )
-
-            st.session_state.result = None
-            st.session_state.evaluated_claim_id = None
-
-
-# ==========================================================
-# Upload JSON Mode
-# ==========================================================
+        note = selected_claim.get("expected_notes")
+        if note:
+            st.sidebar.caption(note)
 
 else:
+    uploaded = st.sidebar.file_uploader("Claim JSON", type=["json"])
 
-    uploaded_file = st.sidebar.file_uploader(
-        "Upload Claim JSON",
-        type=["json"],
-    )
+    if uploaded is not None:
+        try:
+            selected_claim = json.load(uploaded)
+        except json.JSONDecodeError as exc:
+            st.sidebar.error(f"Not valid JSON: {exc.msg}")
 
-    if uploaded_file is not None:
-
-        selected_claim = json.load(uploaded_file)
-
-        if (
-            st.session_state.current_claim_id
-            != selected_claim["claim_id"]
-        ):
-
-            st.session_state.current_claim_id = (
-                selected_claim["claim_id"]
-            )
-
-            st.session_state.result = None
-            st.session_state.evaluated_claim_id = None
-
-
-# ==========================================================
-# Agent
-# ==========================================================
-
-agent = ReimbursementAgent()
-
-
-# ==========================================================
-# Evaluate Button
-# ==========================================================
+if selected_claim and st.session_state.current_claim_id != selected_claim.get("claim_id"):
+    st.session_state.current_claim_id = selected_claim.get("claim_id")
+    reset_result()
 
 run_clicked = st.sidebar.button(
-    "Evaluate Claim",
+    "Evaluate claim",
     use_container_width=True,
+    type="primary",
+    disabled=selected_claim is None,
 )
 
+st.sidebar.divider()
+st.sidebar.caption(f"Model: `{GROQ_MODEL}`")
+st.sidebar.caption("Amounts are computed in Python. The LLM explains and judges.")
 
-# ==========================================================
-# Claim Details
-# (Shown immediately after selecting a claim)
-# ==========================================================
+
+# ---------------------------------------------------------------------------
+# Header
+# ---------------------------------------------------------------------------
+
+st.title("💼 Travel Reimbursement Approval Agent")
+st.caption(
+    "A LangGraph agent that checks travel claims against policy. "
+    "Deterministic rules compute every amount; the LLM investigates ambiguity; "
+    "a guardrail has the final say."
+)
+
+with st.expander("How it works", expanded=st.session_state.result is None):
+    st.graphviz_chart(WORKFLOW_DOT, use_container_width=True)
+
+    left, middle, right = st.columns(3)
+    with left:
+        st.markdown(
+            "**Rules first**  \nLimits, receipts, duplicates and the deadline "
+            "are checked in plain Python before the model sees anything."
+        )
+    with middle:
+        st.markdown(
+            "**Then the agent**  \nThe LLM chooses which of five tools to call, "
+            "reads the results, and can look further."
+        )
+    with right:
+        st.markdown(
+            "**Guardrail last**  \nThe model may escalate to Manual Review, but "
+            "can never approve more than the rules allow."
+        )
+
+
+# ---------------------------------------------------------------------------
+# Claim details
+# ---------------------------------------------------------------------------
 
 if selected_claim is not None:
+    st.subheader("Claim")
 
-    st.subheader("Claim Details")
+    top = st.columns(4)
+    top[0].metric("Claim ID", selected_claim.get("claim_id", "—"))
+    top[1].metric("Employee", selected_claim.get("employee_name", "—"))
+    top[2].metric("Department", selected_claim.get("department", "—"))
+    top[3].metric("Total claimed", f"₹{selected_claim.get('total_amount', 0):,.0f}")
 
-    left, right = st.columns(2)
+    meta = st.columns(4)
+    meta[0].metric("Travel start", selected_claim.get("travel_start_date", "—"))
+    meta[1].metric("Travel end", selected_claim.get("travel_end_date", "—"))
+    meta[2].metric("Submitted", selected_claim.get("submission_date", "—"))
+    meta[3].metric("Trip type", selected_claim.get("travel_category", "—").title())
 
-    with left:
-
-        st.metric(
-            "Claim ID",
-            selected_claim["claim_id"],
-        )
-
-        st.metric(
-            "Employee",
-            selected_claim["employee_name"],
-        )
-
-        st.metric(
-            "Department",
-            selected_claim["department"],
-        )
-
-    with right:
-
-        st.metric(
-            "Trip Start",
-            selected_claim["travel_start_date"],
-        )
-
-        st.metric(
-            "Trip End",
-            selected_claim["travel_end_date"],
-        )
-
-        st.metric(
-            "Submission",
-            selected_claim["submission_date"],
-        )
-
-    st.divider()
-
-    st.subheader("Expense Items")
+    if selected_claim.get("trip_purpose"):
+        st.caption(f"Purpose: {selected_claim['trip_purpose']}")
 
     st.dataframe(
-        selected_claim["expenses"],
+        selected_claim.get("expenses", []),
         use_container_width=True,
+        hide_index=True,
     )
 
 
-# ==========================================================
-# Run Agent
-# ==========================================================
+# ---------------------------------------------------------------------------
+# Run
+# ---------------------------------------------------------------------------
 
-if run_clicked:
-    if selected_claim is None:
-        st.warning("Please select or upload a claim first.")
-    else:
-        with st.spinner("Running AI Reimbursement Agent..."):
-            result = agent.run_claim(selected_claim)
-        st.session_state.result = result
-        st.session_state.evaluated_claim_id = (
-            selected_claim["claim_id"]
-        )
-        st.success("Evaluation completed.")
+if run_clicked and selected_claim is not None:
+    with st.status("Evaluating claim...", expanded=True) as status:
+        seen: set[str] = set()
+
+        def report(node_name: str) -> None:
+            if node_name not in seen:
+                seen.add(node_name)
+                status.write(f"✓ {NODE_LABELS.get(node_name, node_name)}")
+
+        try:
+            st.session_state.result = run_claim(selected_claim, on_node=report)
+            st.session_state.evaluated_claim_id = selected_claim.get("claim_id")
+            status.update(label="Evaluation complete", state="complete", expanded=False)
+        except Exception as exc:
+            status.update(label="Evaluation failed", state="error")
+            st.error(f"{type(exc).__name__}: {exc}")
 
 
-# ==========================================================
-# Display Evaluation
-# (Only after Evaluate button is clicked)
-# ==========================================================
+# ---------------------------------------------------------------------------
+# Result
+# ---------------------------------------------------------------------------
 
-if st.session_state.result is not None:
+result = st.session_state.result
 
-    result = st.session_state.result
-    planner_tools = result["selected_tools"]
-    tool_results = result["tool_results"]
+if result is not None:
     decision = result["decision"]
+    facts = result["facts"]
 
     st.divider()
 
-    # ======================================================
-    # Planner
-    # ======================================================
+    icon, render = DECISION_STYLE.get(decision["decision"], ("⚪", st.info))
+    render(f"{icon}  **{decision['decision']}**")
 
-    st.subheader("🧠 Planner Decision")
-
-    st.write(
-        "The planner selected the following business tools before evaluating the claim."
-    )
-
-    planner_cols = st.columns(max(len(planner_tools), 1))
-
-    for i, tool in enumerate(planner_tools):
-        with planner_cols[i]:
-            st.success(tool)
-
-    st.divider()
-
-    # ======================================================
-    # Tool Results
-    # ======================================================
-
-    st.subheader("🛠 Tool Execution Results")
-
-    if "policy" in tool_results:
-        with st.expander(
-            "📘 Retrieved Policy",
-            expanded=False,
-        ):
-            st.markdown(tool_results["policy"])
-
-    if "receipt_validation" in tool_results:
-        with st.expander(
-            "🧾 Receipt Validation",
-            expanded=False,
-        ):
-            for receipt in tool_results["receipt_validation"]:
-                st.json(receipt)
-
-    if "limit_check" in tool_results:
-        with st.expander(
-            "💰 Reimbursement Limit Check",
-            expanded=False,
-        ):
-            st.json(tool_results["limit_check"])
-
-    if "duplicate_check" in tool_results:
-        with st.expander(
-            "🔁 Duplicate Receipt Check",
-            expanded=False,
-        ):
-            for duplicate in tool_results["duplicate_check"]:
-                st.json(duplicate)
-
-    if "threshold_check" in tool_results:
-        with st.expander(
-            "👤 Approval Threshold",
-            expanded=False,
-        ):
-            st.json(tool_results["threshold_check"])
-
-    st.divider()
-
-    # ======================================================
-    # Final Decision
-    # ======================================================
-
-    st.subheader("✅ Final Decision")
-
-    decision_value = decision["decision"]
-
-    if decision_value == "Approve":
-        st.success(f"🟢 {decision_value}")
-    elif decision_value == "Partially Approve":
-        st.warning(f"🟡 {decision_value}")
-    elif decision_value == "Reject":
-        st.error(f"🔴 {decision_value}")
-    else:
-        st.info(f"🟠 {decision_value}")
-
-    st.divider()
-
-    # ======================================================
-    # Decision Summary
-    # ======================================================
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric(
-            "Approved Amount",
-            f"₹ {decision['approved_amount']:,}",
+    if result.get("llm_error"):
+        st.warning(
+            "The language model was unavailable, so this decision came from the "
+            "rule engine alone.",
+            icon="⚠️",
         )
 
-    with col2:
-        st.metric(
-            "Rejected Amount",
-            f"₹ {decision['rejected_amount']:,}",
+    summary = st.columns(4)
+    summary[0].metric("Approved", f"₹{decision['approved_amount']:,.0f}")
+    summary[1].metric("Rejected", f"₹{decision['rejected_amount']:,.0f}")
+    summary[2].metric("Confidence", f"{decision['confidence'] * 100:.0f}%")
+    summary[3].metric("Approver", decision.get("required_approver") or "—")
+
+    if decision["reason_codes"]:
+        st.write(" ".join(f"`{code}`" for code in decision["reason_codes"]))
+
+    decision_tab, rules_tab, trail_tab, policy_tab, json_tab = st.tabs(
+        ["Decision", "Rule engine", "Agent trail", "Policy", "JSON"]
+    )
+
+    # -- Decision ----------------------------------------------------------
+
+    with decision_tab:
+        st.markdown("#### Explanation")
+        st.write(decision["explanation"])
+
+        left, right = st.columns(2)
+
+        with left:
+            st.markdown("#### Missing documents")
+            if decision["missing_documents"]:
+                for document in decision["missing_documents"]:
+                    st.write(f"- {document}")
+            else:
+                st.caption("None.")
+
+        with right:
+            st.markdown("#### Policy references")
+            if decision["policy_references"]:
+                for reference in decision["policy_references"]:
+                    st.write(f"- {reference}")
+            else:
+                st.caption("None cited.")
+
+    # -- Rule engine -------------------------------------------------------
+
+    with rules_tab:
+        st.caption(
+            "Computed in Python before the model ran. These numbers are not "
+            "the model's to change."
         )
 
-    with col3:
-        st.metric(
-            "Confidence",
-            f"{decision['confidence'] * 100:.1f}%",
+        cols = st.columns(4)
+        cols[0].metric("Baseline decision", facts["baseline_decision"])
+        cols[1].metric("Policy allows", f"₹{facts['total_allowed']:,.0f}")
+        cols[2].metric("Nights", facts["nights"])
+        cols[3].metric(
+            "Days to submit",
+            f"{facts['days_to_submit']} / {facts['submission_window_days']}",
         )
 
-    st.divider()
+        st.markdown("#### Expense lines")
+        st.dataframe(
+            [
+                {
+                    "Category": finding["category"],
+                    "Receipt": finding["receipt_id"],
+                    "Claimed": finding["claimed_amount"],
+                    "Allowed": finding["allowed_amount"],
+                    "Excess": finding["excess_amount"],
+                    "Limit applied": finding["limit_basis"] or "—",
+                    "Flags": ", ".join(finding["reason_codes"]) or "—",
+                }
+                for finding in facts["expense_findings"]
+            ],
+            use_container_width=True,
+            hide_index=True,
+        )
 
-    # ======================================================
-    # Missing Documents
-    # ======================================================
+        notes = [
+            note
+            for finding in facts["expense_findings"]
+            for note in finding["notes"]
+        ]
+        if notes:
+            st.markdown("#### Notes")
+            for note in notes:
+                st.write(f"- {note}")
 
-    st.subheader("📄 Missing Documents")
+    # -- Agent trail -------------------------------------------------------
 
-    missing_docs = decision.get(
-        "missing_documents",
-        [],
-    )
+    with trail_tab:
+        st.caption(
+            "Every step taken, in order, including which tools the model chose "
+            "to call."
+        )
 
-    if missing_docs:
-        for doc in missing_docs:
-            st.write(f"• {doc}")
-    else:
-        st.success("No missing documents.")
+        for step in result["audit_trail"]:
+            marker = {"ok": "✓", "override": "⚠", "failed": "✗"}.get(
+                step["status"], "•"
+            )
+            with st.expander(
+                f"{marker} {step['step']}. {step['tool_name']}",
+                expanded=step["status"] != "ok",
+            ):
+                st.write(step["details"])
 
-    st.divider()
+    # -- Policy ------------------------------------------------------------
 
-    # ======================================================
-    # Policy References
-    # ======================================================
+    with policy_tab:
+        st.caption(
+            f"{len(result['retrieved_sections'])} clause(s) retrieved. The agent "
+            "may only cite sections from this set."
+        )
+        st.write(" ".join(f"`{s}`" for s in result["retrieved_sections"]))
+        st.markdown("---")
+        st.markdown(result["policy_context"])
 
-    st.subheader("📚 Policy References")
+    # -- JSON --------------------------------------------------------------
 
-    policy_refs = decision.get(
-        "policy_references",
-        [],
-    )
-
-    if policy_refs:
-        for ref in policy_refs:
-            st.write(f"• {ref}")
-    else:
-        st.info("No policy references returned.")
-
-    st.divider()
-
-    # ======================================================
-    # AI Explanation
-    # ======================================================
-
-    st.subheader("💬 AI Explanation")
-
-    explanation = decision.get(
-        "explanation",
-        "",
-    )
-
-    if explanation:
-        st.info(explanation)
-    else:
-        st.warning("No explanation returned by the AI.")
-
-    st.divider()
-
-    # ======================================================
-    # Raw JSON
-    # ======================================================
-
-    with st.expander(
-        "📦 Full JSON Output",
-        expanded=False,
-    ):
+    with json_tab:
         st.json(result)
 
-    # ======================================================
-    # Download Decision
-    # ======================================================
-
     st.download_button(
-        label="⬇ Download Decision JSON",
-        data=json.dumps(result, indent=4),
+        "⬇ Download decision JSON",
+        data=json.dumps(result, indent=2, ensure_ascii=False),
         file_name=f"{st.session_state.evaluated_claim_id}_decision.json",
         mime="application/json",
     )
 
-
-# ==========================================================
-# Footer
-# ==========================================================
-
-st.divider()
-
-# st.caption(
-#     "Built for the HCLTech GenAI Developer Assignment | "
-#     "Planner → RAG → Business Tools → LLM Decision"
-# )
+elif selected_claim is None:
+    st.info("Pick a sample claim or upload one to begin.", icon="👈")
