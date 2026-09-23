@@ -476,3 +476,77 @@ if __name__ == "__main__":
             f"allowed=₹{facts.total_allowed:>9,.0f}  rejected=₹{facts.total_rejected:>8,.0f}  "
             f"codes={[c.value for c in facts.reason_codes]}"
         )
+
+
+def is_rules_conclusive(facts: ClaimFacts) -> tuple[bool, str | None]:
+    """
+    Can the LLM's investigation still change this outcome?
+
+    Running the agent loop costs several sequential model calls, so it is only
+    worth doing when the answer is genuinely open. Two cases are already
+    settled by the rules:
+
+    - The baseline is Manual Review. The guardrail never lets the model clear a
+      blocking reason code, so whatever it finds, a human still reviews this.
+    - The baseline is Reject, which here only happens for late submission.
+      Section 11.3 does allow a late claim to be escalated with supporting
+      documentation, but nothing in a claim can carry that evidence, so there
+      is nothing for the model to discover.
+
+    Anything else — including a plain Approve — still runs the full loop,
+    because that is where the model earns its place: spotting a destination
+    that contradicts the trip purpose, or a description naming something the
+    policy excludes.
+    """
+
+    if facts.baseline_decision == Decision.MANUAL_REVIEW:
+        codes = ", ".join(c.value for c in facts.reason_codes) or "a blocking issue"
+        return True, (
+            f"Rules already require a human reviewer ({codes}); the guardrail "
+            "would not let an investigation clear it."
+        )
+
+    if facts.baseline_decision == Decision.REJECT:
+        return True, (
+            f"Submitted {facts.days_to_submit} days after travel against a "
+            f"{facts.submission_window_days}-day limit. Section 11.2 rejects "
+            "this outright and the claim carries no evidence of a Section 11.3 "
+            "exception."
+        )
+
+    return False, None
+
+
+def explain_from_rules(facts: ClaimFacts) -> str:
+    """
+    Write the decision explanation from the facts alone.
+
+    Used when the investigation is skipped, so the employee still gets a
+    readable reason without spending a model call on a foregone conclusion.
+    """
+
+    lines: list[str] = []
+
+    if facts.baseline_decision == Decision.REJECT:
+        lines.append(
+            f"This claim is rejected because it was submitted "
+            f"{facts.days_to_submit} days after travel ended, beyond the "
+            f"{facts.submission_window_days}-day limit in Section 11.1. "
+            "Section 11.2 rejects claims submitted after that window."
+        )
+    elif facts.baseline_decision == Decision.MANUAL_REVIEW:
+        lines.append(
+            "This claim needs a human reviewer before it can be settled. "
+            f"Of the ₹{facts.total_claimed:,.0f} claimed, "
+            f"₹{facts.total_allowed:,.0f} is within policy, pending that review."
+        )
+
+    if facts.blocking_issues:
+        lines.append("")
+        lines.extend(f"- {issue}" for issue in facts.blocking_issues)
+
+    if facts.missing_documents:
+        lines.append("")
+        lines.append("Please provide: " + "; ".join(facts.missing_documents) + ".")
+
+    return "\n".join(lines).strip()

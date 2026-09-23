@@ -20,8 +20,9 @@ budget is spent. It degrades to Manual Review rather than failing.
 ## Architecture
 
 ```
-intake ──▶ precheck ──▶ retrieve ──▶ agent ⇄ tools ──▶ decide ──▶ guardrail ──▶ END
-           (rules)      (policy)     (LLM chooses)      (LLM)      (rules win)
+intake ─▶ precheck ─▶ retrieve ─┬─▶ agent ⇄ tools ─▶ decide ─┬─▶ guardrail ─▶ END
+          (rules)     (policy)  │   (LLM chooses)    (LLM)   │   (rules win)
+                                └──────── settled ───────────┘
 ```
 
 | Node | Does | Runs on |
@@ -43,6 +44,10 @@ Three properties fall out of this shape:
 - **It fails safe, not open.** If the LLM is unavailable or rate-limited, the
   amounts are still computed, rule-determined rejections still stand, but
   anything approvable goes to a human rather than being auto-approved.
+- **It knows when not to think.** On a late submission or a duplicate receipt
+  the guardrail has already fixed the outcome, so the agent loop is skipped
+  entirely and the claim resolves in about 0.1 seconds with no model calls.
+  Claims where the answer is genuinely open still run the full loop.
 
 ---
 
@@ -159,7 +164,7 @@ A free Groq API key comes from [console.groq.com/keys](https://console.groq.com/
 ```bash
 pip install -r requirements-dev.txt   # adds pytest to the runtime deps
 
-pytest tests/ -q             # 73 tests, no API key needed
+pytest tests/ -q             # 78 tests, no API key needed
 python -m evals.run_eval     # full agent over the golden set (~5 min, uses API)
 python -m evals.run_eval --claim CLM-002
 ```
@@ -217,6 +222,18 @@ the model never read is rejected the same as an invented one.
 independently agree, 0.55 when they disagree or the model was unavailable,
 capped at 0.60 for Manual Review, reduced for unverifiable citations. A
 model's self-reported confidence carries no information about correctness.
+
+**The agent is skipped when it cannot change the answer.** A duplicate receipt
+or a late submission is settled by the rules, and the guardrail would not let an
+investigation clear either one — so several sequential model calls would spend
+time and tokens reaching a conclusion already reached. Those claims resolve in
+about 0.1 seconds with the explanation written from the facts. Claims where the
+answer is open, including every plain Approve, still run the full loop, because
+that is exactly where a description or a destination mismatch might be hiding.
+The cost is that Section 11.3, which allows a late claim to be escalated with
+supporting documentation, is unreachable — nothing in a claim can carry that
+evidence today, so nothing is lost yet, but a schema that could would need this
+revisited.
 
 **FAISS is arguably overkill** for a six-page policy that would fit in the
 prompt. It is kept because it makes citations verifiable and because the
@@ -283,7 +300,7 @@ models/
   schema.py      Pydantic contracts, including reason codes
 data/            policy, limits, approval matrix, receipts, sample claims
 evals/run_eval.py  scores decisions, amounts and citations
-tests/           73 tests, no API key required
+tests/           78 tests, no API key required
 outputs/         generated decisions and eval summary
 ```
 

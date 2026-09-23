@@ -39,7 +39,7 @@ from agent.prompts import (
     build_claim_brief,
     format_facts,
 )
-from agent.rules import evaluate_claim
+from agent.rules import evaluate_claim, explain_from_rules, is_rules_conclusive
 from agent.tools import AGENT_TOOLS
 from models.schema import (
     AuditTrailStep,
@@ -69,6 +69,7 @@ class AgentState(TypedDict, total=False):
     llm_decision: LLMDecision | None
     decision: dict
     llm_error: str | None
+    llm_skipped: str | None
 
 
 def _step(state: AgentState, tool_name: str, status: str, details: str) -> AuditTrailStep:
@@ -203,6 +204,34 @@ def retrieve_node(state: AgentState) -> dict:
                 "ok",
                 f"Retrieved {len(documents)} clause(s): {', '.join(sections)}.",
             )
+        ],
+    }
+
+
+def should_investigate_at_all(state: AgentState) -> str:
+    """
+    Decide whether the agent loop is worth running.
+
+    On a late submission or a duplicate receipt the guardrail has already
+    fixed the outcome, so several sequential model calls would cost time and
+    tokens to reach a conclusion the rules reached instantly. Knowing when not
+    to call the model is part of the design, not a shortcut around it.
+    """
+
+    conclusive, _ = is_rules_conclusive(state["facts"])
+
+    return "settled" if conclusive else "investigate"
+
+
+def record_skip_node(state: AgentState) -> dict:
+    """Note in the audit trail why the investigation was skipped."""
+
+    _, reason = is_rules_conclusive(state["facts"])
+
+    return {
+        "llm_skipped": reason,
+        "audit": [
+            _step(state, "agent", "skipped", reason or "Outcome already settled by the rules."),
         ],
     }
 
@@ -464,10 +493,17 @@ def guardrail_node(state: AgentState) -> dict:
 
     facts: ClaimFacts = state["facts"]
     llm_decision: LLMDecision | None = state.get("llm_decision")
+    skip_reason = state.get("llm_skipped")
 
     proposed = llm_decision.decision if llm_decision else None
 
-    final_decision, override_note = _resolve_decision(facts, proposed)
+    if skip_reason:
+        # The investigation was skipped because it could not change anything,
+        # which is different from the model having failed. The rules decided,
+        # and they are deterministic, so this is a confident answer.
+        final_decision, override_note = facts.baseline_decision, None
+    else:
+        final_decision, override_note = _resolve_decision(facts, proposed)
 
     supported, unsupported = verify_policy_references(
         llm_decision.policy_references if llm_decision else [],
@@ -480,6 +516,8 @@ def guardrail_node(state: AgentState) -> dict:
 
     if llm_decision:
         explanation = llm_decision.explanation
+    elif skip_reason:
+        explanation = explain_from_rules(facts)
     else:
         reason = state.get("llm_error", "the language model was unavailable")
         explanation = (
@@ -506,7 +544,12 @@ def guardrail_node(state: AgentState) -> dict:
         missing_documents=facts.missing_documents,
         policy_references=references,
         reason_codes=facts.reason_codes,
-        confidence=_confidence(facts, proposed, final_decision, unsupported),
+        confidence=(
+            # Fully rule-determined: no model opinion to agree or disagree with.
+            0.95
+            if skip_reason
+            else _confidence(facts, proposed, final_decision, unsupported)
+        ),
         explanation=explanation,
         required_approver=facts.required_approver,
     )
@@ -542,12 +585,17 @@ def build_graph():
     graph.add_node("tools", ToolNode(AGENT_TOOLS))
     graph.add_node("tools_audit", tools_audit_node)
     graph.add_node("decide", decide_node)
+    graph.add_node("record_skip", record_skip_node)
     graph.add_node("guardrail", guardrail_node)
 
     graph.add_edge(START, "intake")
     graph.add_edge("intake", "precheck")
     graph.add_edge("precheck", "retrieve")
-    graph.add_edge("retrieve", "agent")
+    graph.add_conditional_edges(
+        "retrieve",
+        should_investigate_at_all,
+        {"investigate": "agent", "settled": "record_skip"},
+    )
 
     graph.add_conditional_edges(
         "agent",
@@ -557,6 +605,7 @@ def build_graph():
 
     graph.add_edge("tools_audit", "tools")
     graph.add_edge("tools", "agent")
+    graph.add_edge("record_skip", "guardrail")
     graph.add_edge("decide", "guardrail")
     graph.add_edge("guardrail", END)
 

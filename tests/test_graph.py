@@ -244,3 +244,75 @@ def test_outage_on_an_approvable_claim_does_not_approve_it():
 
     assert final == Decision.MANUAL_REVIEW
     assert "not auto-approved" in note
+
+
+# ---------------------------------------------------------------------------
+# Skipping the investigation when it cannot change anything
+# ---------------------------------------------------------------------------
+
+
+def test_late_and_blocked_claims_skip_the_investigation():
+    """A duplicate or a late submission is already settled by the rules."""
+
+    from agent.rules import is_rules_conclusive
+
+    for claim_id in ("CLM-003", "CLM-004", "CLM-005"):
+        facts = evaluate_claim(load_claim(claim_id))
+        conclusive, reason = is_rules_conclusive(facts)
+
+        assert conclusive, f"{claim_id} should not need the LLM"
+        assert reason
+
+
+def test_judgement_cases_still_run_the_agent():
+    """
+    The claims that justify having an LLM must never be skipped.
+
+    CLM-006 and CLM-007 pass every numeric rule, so skipping them would
+    silently approve exactly the cases the model exists to catch.
+    """
+
+    from agent.rules import is_rules_conclusive
+
+    for claim_id in ("CLM-001", "CLM-002", "CLM-006", "CLM-007"):
+        facts = evaluate_claim(load_claim(claim_id))
+        conclusive, _ = is_rules_conclusive(facts)
+
+        assert not conclusive, f"{claim_id} still needs investigating"
+
+
+def test_skipped_claim_decides_without_calling_the_llm(no_llm):
+    """
+    With the LLM deliberately broken, a skipped claim still resolves normally.
+
+    This separates the two paths: a skip is not an outage, so the fail-safe
+    must not kick in and turn a rule-based Reject into Manual Review.
+    """
+
+    result = run_claim(load_claim("CLM-003"))
+    decision = result["decision"]
+
+    assert decision["decision"] == "Reject"
+    assert result.get("llm_error") is None
+    assert decision["confidence"] == 0.95
+
+
+def test_skipped_claim_still_explains_itself(no_llm):
+    """The employee gets a real reason, not an empty field."""
+
+    decision = run_claim(load_claim("CLM-005"))["decision"]
+
+    assert "human reviewer" in decision["explanation"]
+    assert "RCP-003" in decision["explanation"]
+    assert "CLM-001" in decision["explanation"]
+
+
+def test_skip_is_recorded_in_the_audit_trail(no_llm):
+    """Skipping must be visible, not silent."""
+
+    result = run_claim(load_claim("CLM-003"))
+
+    skipped = [s for s in result["audit_trail"] if s["status"] == "skipped"]
+
+    assert skipped
+    assert "Section 11.2" in skipped[0]["details"]
