@@ -7,6 +7,7 @@ swapped from the environment without touching code.
 """
 
 import os
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -26,19 +27,45 @@ VECTOR_DB_PATH = PROJECT_ROOT / "faiss_index"
 POLICY_PATH = DATA_DIR / "travel_policy.md"
 
 
+def _setting(name: str, default: str = "") -> str:
+    """
+    Read a setting from the environment, then from Streamlit secrets.
+
+    Locally the value comes from .env. On Streamlit Cloud there is no .env —
+    values are entered in the dashboard and surface through st.secrets, which
+    is not guaranteed to be mirrored into os.environ. Checking both means the
+    same code runs in either place.
+    """
+
+    value = os.getenv(name)
+    if value:
+        return value
+
+    # Only consult Streamlit if it is already running; importing it here would
+    # be wrong for the CLI and the tests.
+    streamlit = sys.modules.get("streamlit")
+    if streamlit is not None:
+        try:
+            return str(streamlit.secrets[name])
+        except Exception:
+            pass
+
+    return default
+
+
 # --- Models ----------------------------------------------------------------
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_API_KEY = _setting("GROQ_API_KEY")
 
 # Groq retired the Llama chat models, so the earlier default
 # (llama-3.3-70b-versatile) no longer resolves. gpt-oss-120b is the strongest
 # remaining option with native tool calling; gpt-oss-20b is the lighter
 # fallback if the free tier rate-limits the larger model.
-GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+GROQ_MODEL = _setting("GROQ_MODEL", "openai/gpt-oss-120b")
 
-GROQ_FALLBACK_MODEL = os.getenv("GROQ_FALLBACK_MODEL", "openai/gpt-oss-20b")
+GROQ_FALLBACK_MODEL = _setting("GROQ_FALLBACK_MODEL", "openai/gpt-oss-20b")
 
-EMBEDDING_MODEL = os.getenv(
+EMBEDDING_MODEL = _setting(
     "EMBEDDING_MODEL",
     "sentence-transformers/all-MiniLM-L6-v2",
 )
@@ -48,11 +75,11 @@ EMBEDDING_MODEL = os.getenv(
 
 # Hard ceiling on tool-calling iterations, so a confused model cannot loop
 # forever against the Groq free tier.
-MAX_AGENT_STEPS = int(os.getenv("MAX_AGENT_STEPS", "8"))
+MAX_AGENT_STEPS = int(_setting("MAX_AGENT_STEPS", "8"))
 
 # How long to stop trying the primary model after it rate-limits, so a
 # single 429 does not cost a failed attempt on every later call.
-PRIMARY_COOLDOWN_SECONDS = float(os.getenv("PRIMARY_COOLDOWN_SECONDS", "300"))
+PRIMARY_COOLDOWN_SECONDS = float(_setting("PRIMARY_COOLDOWN_SECONDS", "300"))
 
 LLM_TEMPERATURE = 0.0
 
@@ -68,7 +95,7 @@ def require_api_key() -> str:
     if not GROQ_API_KEY:
         raise RuntimeError(
             "GROQ_API_KEY is not set. Copy .env.example to .env and add your "
-            "key, or set it in Streamlit secrets when deploying."
+            "key locally, or add it under Settings > Secrets on Streamlit Cloud."
         )
 
     return GROQ_API_KEY
