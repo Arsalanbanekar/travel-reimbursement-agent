@@ -7,19 +7,13 @@ These exist so the model can look things up and check its reasoning against
 source data instead of guessing.
 """
 
-import json
 
 from langchain_core.tools import tool
 
-from agent.config import DATA_DIR
+from agent.config import load_data_file as _load
 from rag.retriever import format_sections, get_retriever
 
 _retriever = get_retriever()
-
-
-def _load(filename: str) -> dict:
-    with open(DATA_DIR / filename, "r", encoding="utf-8") as f:
-        return json.load(f)
 
 
 @tool

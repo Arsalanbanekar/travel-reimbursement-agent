@@ -159,7 +159,7 @@ A free Groq API key comes from [console.groq.com/keys](https://console.groq.com/
 ```bash
 pip install -r requirements-dev.txt   # adds pytest to the runtime deps
 
-pytest tests/ -q             # 71 tests, no API key needed
+pytest tests/ -q             # 73 tests, no API key needed
 python -m evals.run_eval     # full agent over the golden set (~5 min, uses API)
 python -m evals.run_eval --claim CLM-002
 ```
@@ -283,7 +283,7 @@ models/
   schema.py      Pydantic contracts, including reason codes
 data/            policy, limits, approval matrix, receipts, sample claims
 evals/run_eval.py  scores decisions, amounts and citations
-tests/           71 tests, no API key required
+tests/           73 tests, no API key required
 outputs/         generated decisions and eval summary
 ```
 

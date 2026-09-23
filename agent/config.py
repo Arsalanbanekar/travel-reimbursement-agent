@@ -6,8 +6,10 @@ modules never depend on the current working directory and the model can be
 swapped from the environment without touching code.
 """
 
+import json
 import os
 import sys
+from functools import lru_cache
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -99,3 +101,23 @@ def require_api_key() -> str:
         )
 
     return GROQ_API_KEY
+
+
+# --- Data files ------------------------------------------------------------
+
+
+@lru_cache(maxsize=None)
+def load_data_file(filename: str) -> dict:
+    """
+    Read and parse a file from data/, once per process.
+
+    The policy, limits, receipts and claim history never change while the app
+    is running, but the rule engine re-read all four on every claim and each
+    tool re-read one on every call. Parsing the same JSON repeatedly is work
+    the agent does not need to repeat.
+
+    The cached object is shared, so callers must treat the result as read-only.
+    """
+
+    with open(DATA_DIR / filename, "r", encoding="utf-8") as f:
+        return json.load(f)

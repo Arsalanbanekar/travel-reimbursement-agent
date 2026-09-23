@@ -9,12 +9,11 @@ It never calls an LLM. Given the same claim it always returns the same facts,
 which is what makes the agent's output auditable and testable.
 """
 
-import json
 from collections import defaultdict
 from datetime import date
 from typing import Iterable
 
-from agent.config import DATA_DIR
+from agent.config import load_data_file as _load
 from models.schema import (
     ClaimFacts,
     ClaimInput,
@@ -22,11 +21,6 @@ from models.schema import (
     ExpenseFinding,
     ReasonCode,
 )
-
-
-def _load(filename: str) -> dict:
-    with open(DATA_DIR / filename, "r", encoding="utf-8") as f:
-        return json.load(f)
 
 
 # How each category's cap is applied:

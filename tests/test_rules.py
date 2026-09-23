@@ -550,3 +550,36 @@ def test_very_large_claim_requires_executive_review():
 
     assert facts.requires_executive_review is True
     assert facts.baseline_decision == Decision.MANUAL_REVIEW
+
+
+# ---------------------------------------------------------------------------
+# Cached data files
+# ---------------------------------------------------------------------------
+
+
+def test_data_files_are_parsed_once():
+    """
+    The loader is cached, so repeated reads return the same object.
+
+    This is what makes it cheap, and it is also the risk: anything that mutated
+    the result would corrupt every later claim.
+    """
+
+    from agent.config import load_data_file
+
+    assert load_data_file("receipts.json") is load_data_file("receipts.json")
+
+
+def test_evaluating_a_claim_does_not_mutate_the_shared_data():
+    """Guards the read-only contract the cache depends on."""
+
+    from agent.config import load_data_file
+
+    before = json.dumps(load_data_file("receipts.json"), sort_keys=True)
+
+    for claim in SAMPLE_CLAIMS:
+        evaluate_claim(claim)
+
+    after = json.dumps(load_data_file("receipts.json"), sort_keys=True)
+
+    assert before == after
