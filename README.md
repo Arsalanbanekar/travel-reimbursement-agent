@@ -9,6 +9,12 @@ LLM investigates ambiguity and explains the outcome; a guardrail has the final
 say.** Language models are unreliable at arithmetic and date maths, and good at
 judgement and explanation. This splits the work along that line.
 
+**[Try it live](https://travel-reimbursement-agent-uhti5rhgltsnmgchgjqc5y.streamlit.app/)** — pick CLM-006 to see the case where every number is
+correct and only reading the free text catches the problem. A claim takes 30
+seconds to a few minutes, and the free tier allows about 200,000 tokens a day
+across all visitors, so it may report that the model was unavailable if the
+budget is spent. It degrades to Manual Review rather than failing.
+
 ---
 
 ## Architecture
