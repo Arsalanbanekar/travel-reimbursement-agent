@@ -151,6 +151,8 @@ A free Groq API key comes from [console.groq.com/keys](https://console.groq.com/
 ### Tests and evaluation
 
 ```bash
+pip install -r requirements-dev.txt   # adds pytest to the runtime deps
+
 pytest tests/ -q             # 71 tests, no API key needed
 python -m evals.run_eval     # full agent over the golden set (~5 min, uses API)
 python -m evals.run_eval --claim CLM-002
@@ -315,6 +317,11 @@ outputs/         generated decisions and eval summary
   generation, and nothing in this repo can fix it. Earlier in the week the same
   calls took about 5 seconds. A claim makes 2–6 calls depending on how much the
   agent investigates.
+- **Deployment needs Python 3.12, set in the Streamlit Cloud dashboard.** Its
+  default build image used Python 3.14, where `pyarrow` (a Streamlit
+  dependency) has no wheel and falls back to compiling from source against a
+  `cmake` that is not installed. `runtime.txt` does not control this — Streamlit
+  Cloud reads the version from its own settings, not that file.
 - **The free tier allows 200,000 tokens per day.** A single claim costs roughly
   5,000–15,000 tokens across the agent loop, its tool calls and the decision
   step, so the whole golden set is about 60,000. That is fine for development

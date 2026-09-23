@@ -20,6 +20,3 @@ faiss-cpu==1.14.3
 # --- Validation & config ---
 pydantic==2.12.4
 python-dotenv==1.2.1
-
-# --- Tests ---
-pytest==8.3.4
